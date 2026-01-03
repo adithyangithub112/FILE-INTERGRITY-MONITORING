@@ -158,6 +158,8 @@ This project demonstrates a practical implementation of a **File Integrity Monit
 <img width="1920" height="923" alt="Screenshot_2026-01-02_23_41_13" src="https://github.com/user-attachments/assets/1bba6280-3e5e-4f29-b896-066b9b4e05cc" />
 <img width="1920" height="923" alt="Screenshot_2026-01-02_23_40_58" src="https://github.com/user-attachments/assets/4d54451e-abc7-47c3-b21b-aeea4a7cbc23" />
 <img width="1516" height="308" alt="Screenshot 2026-01-03 102012" src="https://github.com/user-attachments/assets/b2ac4d2a-399f-43af-b806-3982b37b5d58" />
+<img width="1645" height="552" alt="Screenshot 2026-01-03 104040" src="https://github.com/user-attachments/assets/11b5ca52-f011-4b55-bada-7cd8443f14d5" />
+
 
 
 
