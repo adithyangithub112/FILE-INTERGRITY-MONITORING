@@ -1,156 +1,213 @@
 # File Integrity Monitoring System
 
-## 1. Introduction
+## 1. Abstract
 
-File Integrity Monitoring (FIM) is a security mechanism used to detect unauthorized changes to files and directories. It ensures that critical system and application files are not modified, deleted, or replaced without authorization.
-
-This project implements a **Python-based File Integrity Monitoring system** with **automated alerting and ticket creation**.
-
-## 2. Objectives
-
-The main objectives of this project are:
-
-- To monitor files in a specified directory
-- To detect file modifications
-- To calculate and compare cryptographic hashes of files
-- To generate automated alerts using email
-- To create incident tickets automatically in **Atlassian Jira**
-- To run the monitoring process automatically using system scheduling
-
-## 3. System Architecture
-
-The system operates in two phases:
-
-1. **Baseline Creation**
-    - Initial hashes of monitored files are calculated
-    - Hash values are stored in a JSON file
-    - This baseline represents the trusted state of files
-2. **Integrity Monitoring**
-    - Current hashes of monitored files are calculated
-    - Current hashes are compared with baseline hashes
-    - Any mismatch indicates a file integrity violation
+File Integrity Monitoring (FIM) is a critical security mechanism used to detect unauthorized modifications to files and directories. This project presents the design and implementation of a **Python-based File Integrity Monitoring system** that detects file integrity violations using cryptographic hashing and file metadata analysis. The system also supports detection of new and deleted files, automated incident ticket creation using **Atlassian Jira**, email alerting, and scheduled execution using Linux cron jobs. The project demonstrates practical security monitoring techniques used in real-world systems and emphasizes automation, secure configuration, and error handling.
 
 ---
 
-## 4. Technologies Used
+## 2. Introduction
+
+In modern computing environments, files play a crucial role in system configuration, application execution, and data storage. Unauthorized modification of files can lead to security breaches, malware execution, or system instability. File Integrity Monitoring is a security technique used to ensure that files remain unchanged unless explicitly authorized.
+
+This project aims to build a lightweight but effective File Integrity Monitoring system using Python that can detect file modifications, additions, and deletions, and automatically report these incidents through a ticketing and alerting mechanism.
+
+---
+
+## 3. Objectives
+
+The objectives of this project are:
+
+- To monitor files within a specified directory
+- To calculate cryptographic hash values for file integrity verification
+- To detect unauthorized file modifications
+- To detect new file creation and file deletion
+- To generate automated incident tickets using Jira
+- To send real-time email alerts for detected violations
+- To automate the monitoring process using Linux scheduling
+- To handle runtime errors and exceptions gracefully
+
+---
+
+## 4. Scope of the Project
+
+The scope of this project includes:
+
+- Monitoring of files inside a predefined directory
+- Scheduled integrity checks at fixed intervals
+- Automated alerting and incident creation
+
+The project does not include:
+
+- Kernel-level monitoring
+- Real-time event-based monitoring
+- Malware detection or prevention
+
+---
+
+## 5. System Architecture
+
+The system follows a baseline-based monitoring approach and consists of the following components:
+
+1. **Baseline Generator**
+    
+    Creates a trusted baseline of file hashes and metadata.
+    
+2. **Integrity Checker**
+    
+    Periodically scans monitored files and compares them with the baseline.
+    
+3. **Alerting Module**
+    
+    Sends email notifications and creates Jira tickets when violations are detected.
+    
+4. **Automation Layer**
+    
+    Uses cron jobs to execute the monitoring process automatically.
+    
+
+---
+
+## 6. Technologies Used
 
 - **Programming Language:** Python 3
 - **Hashing Algorithm:** SHA-256
-- **Data Storage:** JSON
-- **Ticketing System:** Jira REST API
-- **Alerting Mechanism:** Email (SMTP)
-- **Automation:** Cron Jobs
 - **Operating System:** Linux
+- **Ticketing System:** Jira REST API
+- **Alerting Mechanism:** SMTP Email
+- **Data Storage:** JSON
+- **Automation Tool:** Cron
 
 ---
 
-## 5. Project Structure
+## 7. Project Directory Structure
 
 ```
-fim-project/
-│
-├── monitor_folder/
-│   └── app.py
-│
-├──data/
-│   └── baseline_hashes.json
+fim/
 │
 ├── baseline_generator.py
 ├── integrity_checker.py
 ├── jira_integration.py
 ├── email_alert.py
-└── requirements.txt
+├── requirements.txt
+│
+├── monitor_folder/
+│   └── app.py
+│
+└──data/
+    └── baseline.json
 
 ```
 
 ---
 
-## 6. Module Description
+## 8. Module Description
 
-### 6.1 Baseline Generator
+### 8.1 Baseline Generator
 
-- Iterates through all files in the monitored directory
-- Calculates SHA-256 hash values
-- Stores file paths and hashes in a JSON file
-- Executed only once to establish a trusted baseline
+The baseline generator calculates the SHA-256 hash, last modified time, and change time of each monitored file. This information is stored in a JSON file and represents the trusted state of the system.
 
 ---
 
-### 6.2 Integrity Checker
+### 8.2 Integrity Checker
 
-- Loads baseline hash values from the JSON file
-- Recalculates current hash values of monitored files
-- Compares baseline and current hashes
-- Detects only **file modifications**
-- Triggers alerts if a hash mismatch is found
+The integrity checker performs the following operations:
 
----
-
-### 6.3 Jira Integration
-
-- Uses Jira REST API for issue creation
-- Automatically creates a ticket for each integrity violation
-- Includes file path details in the ticket
+- Loads baseline data
+- Scans current files
+- Compares current hashes and metadata with baseline values
+- Detects file modifications, new files, and deleted files
+- Triggers alerts when violations are found
 
 ---
 
-### 6.4 Email Alert Module
+### 8.3 Jira Integration Module
 
-- Sends email notifications for file integrity violations
-- Notifies administrators immediately upon detection
-
----
-
-## 7. Automation
-
-The integrity checker script is automated using **cron**:
-
-- Executes at fixed intervals
-- Continuously monitors file integrity
-- Runs without manual intervention
+This module integrates with Jira using REST APIs. When an integrity violation occurs, a new issue is automatically created in the Jira project, ensuring proper incident tracking and accountability.
 
 ---
 
-## 8. Security Considerations
+### 8.4 Email Alert Module
 
-- Credentials and API tokens are stored using environment variables
-- Baseline file is protected from modification
-- File integrity baseline is updated only after manual approval
-- Prevents silent acceptance of unauthorized file changes
+The email alert module sends notification emails containing:
+
+- File path
+- Type of integrity violation
+- Timestamp of detection
+
+This provides immediate visibility of security incidents.
 
 ---
 
-## 9. Results
+## 9. Automation Using Cron
+
+The integrity checker is automated using Linux cron jobs and is scheduled to run **every one hour**. A wrapper shell script is used to load environment variables and execute the Python script reliably.
+
+---
+
+## 10. Security Considerations
+
+- Sensitive credentials are stored using Linux environment variables
+- Baseline generation is a manual and controlled operation
+- No credentials are hardcoded in the source code
+- Monitoring scripts are separated from monitored files to prevent false alerts
+
+---
+
+## 11. Error and Exception Handling
+
+The project includes structured error handling for:
+
+- File access and permission errors
+- Missing or corrupted baseline files
+- Network and Jira API failures
+- Email transmission errors
+
+This ensures that failures in one component do not crash the entire monitoring system.
+
+---
+
+## 12. Limitations
+
+- The system performs scheduled monitoring, not real-time detection
+- Very short-lived file changes may not be detected if reverted before the next scan
+- Timestamp manipulation by privileged attackers is not prevented
+
+---
+
+## 13. Results
 
 The system successfully:
 
-- Detected unauthorized modifications to monitored files
-- Generated Jira tickets automatically
-- Sent email alerts for detected integrity violations
-- Operated automatically through scheduled execution
+- Detected file modifications
+- Detected new file creation
+- Detected file deletion
+- Created Jira tickets automatically
+- Sent email alerts with timestamps
+- Ran autonomously using cron jobs
 
 ---
 
-## 10. Limitations
+## 14. Future Enhancements
 
-- The system does not detect new file creation
-- The system does not detect file deletion
-- Monitoring is limited to files present in the baseline
-
----
-
-## 11. Conclusion
-
-This project demonstrates a practical implementation of a **File Integrity Monitoring system** using Python. By leveraging cryptographic hashing and automation, the system effectively detects file modifications and provides real-time alerts. The project aligns with fundamental security monitoring principles used in real-world environments.
+- Integration of real-time monitoring using Linux inotify
+- Severity-based ticket prioritization
+- Centralized logging and dashboards
+- Integration with messaging platforms such as Slack or Teams
 
 ---
 
-## 12. Future Enhancements
+## 15. Conclusion
 
-- Detection of new and deleted files
-- File whitelist and ignore rules
-- Severity-based alert classification
-- Integration with additional notification platforms
+This project demonstrates the practical implementation of a File Integrity Monitoring system using Python. By combining cryptographic hashing, metadata analysis, automated alerting, and ticket creation, the system provides a reliable and extensible approach to file integrity monitoring. The project reflects real-world security monitoring practices and highlights the importance of automation and secure configuration in system security.
+
+---
+
+## References
+
+- Linux File Integrity Monitoring Concepts
+- Python Documentation
+- Jira REST API Documentation
 
 ## 13. Screenshots
 <img width="1920" height="923" alt="Screenshot_2026-01-02_23_40_48" src="https://github.com/user-attachments/assets/c8cd804a-cfe9-4935-8c13-3785b4749ffa" />
